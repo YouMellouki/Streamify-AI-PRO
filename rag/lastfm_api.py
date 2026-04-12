@@ -3,6 +3,7 @@ from config import LASTFM_API_KEY
 
 async def search_tracks(query):
     if not LASTFM_API_KEY:
+        print("❌ LASTFM_API_KEY missing")
         return []
 
     async with httpx.AsyncClient(timeout=15.0) as client:
@@ -16,10 +17,15 @@ async def search_tracks(query):
                 "limit": 5
             }
         )
+        print(f"Last.fm status: {r.status_code}")
         if r.status_code != 200:
+            print(f"Error: {r.text[:200]}")
             return []
         try:
             items = r.json()["results"]["trackmatches"]["track"]
-            return [f"{t['name']} - {t['artist']}" for t in items]
-        except Exception:
+            tracks = [f"{t['name']} - {t['artist']}" for t in items]
+            print(f"✅ Found {len(tracks)} tracks: {tracks}")
+            return tracks
+        except Exception as e:
+            print(f"❌ Parse error: {e}")
             return []

@@ -7,7 +7,7 @@
 The system integrates:
 
 * 🎧 Semantic search (vector database)
-* ⚡ Real-time data from Spotify API
+* ⚡ Real-time data from Last.fm API
 * 🧠 Large Language Models (LLMs)
 * 🚀 High-performance caching (Redis)
 
@@ -26,7 +26,7 @@ Redis Cache (CAG)  ← reduces cost & latency
    ↓
 Vector DB (FAISS) ← semantic retrieval
    ↓
-Spotify API       ← real-time enrichment
+Last.fm API       ← real-time enrichment
    ↓
 Prompt Builder
    ↓
@@ -46,7 +46,7 @@ Final Answer
 | Embeddings     | SentenceTransformers |
 | Vector DB      | FAISS                |
 | Cache (CAG)    | Redis                |
-| External Data  | Spotify Web API      |
+| External Data  | Last.fm Web API      |
 | Async Requests | httpx                |
 
 ---
@@ -77,7 +77,7 @@ streamify_ai_pro/
 ├── rag/
 │   ├── embedder.py      # Embedding model
 │   ├── retriever.py     # FAISS retrieval
-│   ├── spotify_api.py   # External API integration
+│   ├── Last.fm_api.py   # External API integration
 │   ├── cache.py         # Redis caching (CAG)
 │   ├── generator.py     # LLM interaction
 │   └── pipeline.py      # RAG orchestration
@@ -122,17 +122,17 @@ set Groq_API_KEY=your_Groq_key
 
 ---
 
-#### 🎵 Spotify API (Free)
+#### 🎵 Last.fm API (Free)
 
 Create app:
 
-👉 https://developer.spotify.com/dashboard
+👉 https://developer.Last.fm.com/dashboard
 
 Then:
 
 ```bash
-set SPOTIFY_CLIENT_ID=your_client_id
-set SPOTIFY_CLIENT_SECRET=your_client_secret
+set Last.fm_CLIENT_ID=your_client_id
+set Last.fm_CLIENT_SECRET=your_client_secret
 ```
 
 ---
@@ -176,7 +176,7 @@ Example request:
   "source": "generated",
   "answer": "You should try Drake and The Weeknd for a chill night vibe...",
   "retrieved": [...],
-  "spotify": [...]
+  "Last.fm": [...]
 }
 ```
 

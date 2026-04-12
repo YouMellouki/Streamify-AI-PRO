@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Streamify AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0F0E17;
+  --surface:#16152A;
+  --surface2:#1E1D35;
+  --surface3:#252440;
+  --border:#2A2847;
+  --border2:#3A3860;
+  --text:#F0EEF8;
+  --muted:#8884A8;
+  --muted2:#55526E;
+  --purple:#7F77DD;
+  --purple-light:#AFA9EC;
+  --purple-dim:#1A183A;
+  --teal:#1D9E75;
+  --teal-light:#5DCAA5;
+  --teal-dim:#0a2a1e;
+  --coral:#D85A30;
+  --coral-dim:#2a1208;
+  --pink:#D4537E;
+  --amber:#EF9F27;
+  --amber-dim:#2a1e06;
+  --red:#E24B4A;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;padding:0;line-height:1.6;
+}
+
+/* Hero banner */
+.hero{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:2rem 1.5rem 1.5rem;
+  text-align:center;
+}
+.hero-icon{
+  width:64px;height:64px;
+  background:var(--purple);border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1rem;
+}
+.hero-icon svg{width:34px;height:34px;fill:white}
+.hero h1{
+  font-size:28px;font-weight:800;
+  letter-spacing:-0.8px;
+  background:linear-gradient(135deg,#AFA9EC,#5DCAA5);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{font-size:14px;color:var(--muted);margin-top:6px}
+
+/* Status pill */
+.status-wrap{display:flex;justify-content:center;margin-top:1rem}
+.status{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:20px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;animation:pulse 2s infinite}
+.dot.red{background:var(--red);animation:none}
+.dot.yellow{background:var(--amber);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Main content */
+.main{max-width:720px;margin:0 auto;padding:2rem 1.5rem}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
+.stat{
+  padding:14px;border-radius:14px;text-align:center;
+  background:var(--surface);border:1px solid var(--border);
+}
+.stat-val{font-size:26px;font-weight:800;color:var(--purple-light)}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em}
+
+/* Search */
+.search-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:18px;padding:1.25rem;margin-bottom:1.5rem;
+}
+.search-label{font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em}
+.search-row{display:flex;gap:8px}
+.search-row input{
+  flex:1;padding:13px 16px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:12px;color:var(--text);font-size:15px;outline:none;
+  transition:border-color 0.2s,background 0.2s;
+}
+.search-row input::placeholder{color:var(--muted2)}
+.search-row input:focus{border-color:var(--purple);background:var(--surface3)}
+.search-row button{
+  padding:13px 22px;
+  background:var(--purple);
+  border:none;border-radius:12px;color:white;
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:background 0.15s,transform 0.1s;
+  white-space:nowrap;
+}
+.search-row button:hover{background:#6B63C8}
+.search-row button:active{transform:scale(0.97)}
+.search-row button:disabled{background:var(--surface3);color:var(--muted2);cursor:not-allowed;transform:none}
+
+/* Mood chips */
+.mood-label{font-size:12px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:2rem}
+.chip{
+  padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border2);
+  background:var(--surface);color:var(--muted);
+  transition:all 0.15s;
+}
+.chip:hover{border-color:var(--purple-light);color:var(--purple-light);background:var(--purple-dim)}
+.chip.mood-chill{border-color:#3A3860;color:#AFA9EC}
+.chip.mood-energy{border-color:#2a1e06;color:#EF9F27}
+.chip.mood-sad{border-color:#251530;color:#D4537E}
+.chip.mood-focus{border-color:#0a2a1e;color:#5DCAA5}
+
+/* Loading */
+.loading{
+  display:flex;align-items:center;gap:14px;
+  padding:1.5rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:16px;margin-bottom:1rem;
+}
+.spinner{
+  width:24px;height:24px;border:2px solid var(--border2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin 0.75s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text p{font-size:14px;color:var(--text)}
+.loading-text span{font-size:12px;color:var(--muted)}
+
+/* Result card */
+.result-card{
+  border-radius:18px;overflow:hidden;
+  border:1px solid var(--border2);margin-bottom:1.5rem;
+}
+.result-header{
+  background:var(--surface);
+  padding:1.25rem 1.5rem;
+  border-bottom:1px solid var(--border);
+}
+.result-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:0.03em}
+.badge.generated{background:var(--purple-dim);color:var(--purple-light);border:1px solid #3A2E80}
+.badge.cache{background:var(--teal-dim);color:var(--teal-light);border:1px solid #0F4030}
+.query-label{
+  font-size:13px;color:var(--muted);font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px;
+}
+.answer{font-size:15px;line-height:1.85;color:#D8D4F0}
+
+/* Tracks */
+.tracks-section{
+  background:var(--surface2);
+  padding:1.25rem 1.5rem;
+}
+.section-label{
+  font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:0.08em;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.track-grid{display:flex;flex-direction:column;gap:8px}
+.track{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;
+  transition:border-color 0.15s,background 0.15s;
+}
+.track:hover{border-color:var(--purple);background:var(--surface3)}
+.track-rank{
+  width:26px;height:26px;border-radius:8px;
+  background:var(--purple-dim);border:1px solid #3A2E80;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--purple-light);flex-shrink:0;
+}
+.track-info{flex:1;min-width:0}
+.track-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-artist{font-size:12px;color:var(--muted);margin-top:2px}
+.track-link{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--teal);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;opacity:0;transition:opacity 0.15s;text-decoration:none;
+}
+.track:hover .track-link{opacity:1}
+.track-link svg{width:13px;height:13px;fill:white;margin-left:2px}
+
+/* No results */
+.no-tracks{
+  font-size:13px;color:var(--muted2);font-style:italic;
+  padding:6px 0;display:flex;align-items:center;gap:8px;
+}
+
+/* Error */
+.error-card{
+  padding:1.25rem 1.5rem;
+  background:var(--coral-dim);border:1px solid #5a1a0a;
+  border-radius:16px;font-size:14px;color:#F0997B;margin-bottom:1rem;
+  display:flex;gap:10px;align-items:flex-start;
+}
+
+/* History */
+.history-section{margin-bottom:2rem}
+.history-title{font-size:12px;color:var(--muted2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.history-list{display:flex;flex-direction:column;gap:5px}
+.history-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;
+  cursor:pointer;transition:border-color 0.15s;
+}
+.history-item:hover{border-color:var(--border2)}
+.history-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);flex-shrink:0}
+.history-item span{font-size:13px;color:var(--muted);flex:1}
+.history-item time{font-size:11px;color:var(--muted2)}
+
+/* Info strip */
+.info-strip{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+  margin-top:2rem;padding-top:1.5rem;
+  border-top:1px solid var(--border);
+}
+.info-tile{
+  padding:12px 14px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);
+}
+.info-tile-icon{font-size:16px;margin-bottom:6px}
+.info-tile-text{font-size:12px;color:var(--muted);line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+  </div>
+  <h1>Streamify AI</h1>
+  <p>Music intelligence powered by RAG · Groq LLM · Last.fm</p>
+  <div class="status-wrap">
+    <div class="status">
+      <div class="dot yellow" id="status-dot"></div>
+      <span id="status-text">Connecting to API...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="stat-queries">0</div>
+      <div class="stat-label">Queries</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-cached">0</div>
+      <div class="stat-label">Cached</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-tracks">0</div>
+      <div class="stat-label">Tracks</div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-card">
+    <div class="search-label">What music are you looking for?</div>
+    <div class="search-row">
+      <input type="text" id="query-input" placeholder="e.g. chill music for a rainy night..."/>
+      <button id="ask-btn" onclick="askApi()">Search</button>
+    </div>
+  </div>
+
+  <!-- Mood chips -->
+  <div class="mood-label">Browse by mood</div>
+  <div class="chips">
+    <div class="chip mood-chill" onclick="setQuery('chill music for night')">🌙 Chill night</div>
+    <div class="chip mood-energy" onclick="setQuery('upbeat songs for workout')">💪 Workout</div>
+    <div class="chip mood-sad" onclick="setQuery('sad emotional songs')">💔 Sad mood</div>
+    <div class="chip mood-focus" onclick="setQuery('jazz for studying')">📚 Study jazz</div>
+    <div class="chip" onclick="setQuery('hip hop classics 90s')">🎤 90s hip hop</div>
+    <div class="chip" onclick="setQuery('indie rock road trip')">🚗 Road trip</div>
+    <div class="chip" onclick="setQuery('afrobeats party songs')">🎉 Afrobeats</div>
+    <div class="chip mood-focus" onclick="setQuery('lo-fi beats focus')">🎧 Lo-fi focus</div>
+    <div class="chip mood-sad" onclick="setQuery('romantic dinner songs')">🍷 Romantic</div>
+    <div class="chip mood-energy" onclick="setQuery('electronic dance music')">⚡ EDM</div>
+  </div>
+
+  <!-- Results -->
+  <div id="result-area"></div>
+
+  <!-- History -->
+  <div class="history-section" id="history-wrap" style="display:none">
+    <div class="history-title">Recent searches</div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+
+  <!-- Info strip -->
+  <div class="info-strip">
+    <div class="info-tile">
+      <div class="info-tile-icon">🧠</div>
+      <div class="info-tile-text">Groq LLM generates smart recommendations from real music context</div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-icon">🎵</div>
+      <div class="info-tile-text">Last.fm API provides real-time track and artist data</div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-icon">⚡</div>
+      <div class="info-tile-text">Redis caches results — same query returns instantly next time</div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-icon">🔍</div>
+      <div class="info-tile-text">RAG pipeline enriches context before LLM generation</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API='http://127.0.0.1:8000';
+let stats={queries:0,cached:0,tracks:0};
+let history=JSON.parse(localStorage.getItem('streamify_history')||'[]');
+
+function updateStats(){
+  document.getElementById('stat-queries').textContent=stats.queries;
+  document.getElementById('stat-cached').textContent=stats.cached;
+  document.getElementById('stat-tracks').textContent=stats.tracks;
+}
+
+function saveHistory(q,source){
+  history.unshift({query:q,source,time:new Date().toLocaleTimeString()});
+  if(history.length>6) history=history.slice(0,6);
+  localStorage.setItem('streamify_history',JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory(){
+  if(!history.length) return;
+  document.getElementById('history-wrap').style.display='';
+  document.getElementById('history-list').innerHTML=history.map(h=>`
+    <div class="history-item" onclick="setQuery('${h.query.replace(/'/g,"\\'")}')">
+      <div class="history-dot"></div>
+      <span>${h.query}</span>
+      <time>${h.time}</time>
+    </div>`).join('');
+}
+
+async function checkHealth(){
+  try{
+    const r=await fetch(API+'/health/config',{signal:AbortSignal.timeout(4000)});
+    const d=await r.json();
+    const dot=document.getElementById('status-dot');
+    const txt=document.getElementById('status-text');
+    if(d.status==='ok'){
+      dot.className='dot';
+      txt.textContent='API running — all credentials loaded';
+    } else {
+      dot.className='dot red';
+      txt.textContent='Missing: '+d.missing.join(', ');
+    }
+  } catch {
+    document.getElementById('status-dot').className='dot red';
+    document.getElementById('status-text').textContent='API offline — run: uvicorn app:app --reload';
+  }
+}
+
+function setQuery(text){
+  document.getElementById('query-input').value=text;
+  document.getElementById('query-input').focus();
+}
+
+async function askApi(){
+  const q=document.getElementById('query-input').value.trim();
+  if(!q) return;
+  const btn=document.getElementById('ask-btn');
+  btn.disabled=true; btn.textContent='Thinking...';
+  document.getElementById('result-area').innerHTML=`
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">
+        <p>Searching Last.fm + generating answer</p>
+        <span>Groq LLM — usually 2–5 seconds</span>
+      </div>
+    </div>`;
+  try{
+    const r=await fetch(API+'/ask',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:q}),
+      signal:AbortSignal.timeout(60000)
+    });
+    if(!r.ok){const e=await r.json();throw new Error(e.detail||'Status '+r.status)}
+    const d=await r.json();
+    stats.queries++;
+    if(d.source==='cache') stats.cached++;
+    const tracks=d.tracks||d.spotify||[];
+    stats.tracks+=tracks.length;
+    updateStats();
+    saveHistory(q,d.source);
+    renderResult(d,q);
+  } catch(e){
+    document.getElementById('result-area').innerHTML=`
+      <div class="error-card">⚠ ${e.message}</div>`;
+  } finally{
+    btn.disabled=false; btn.textContent='Search';
+  }
+}
+
+function renderResult(d,q){
+  const badge=d.source==='cache'
+    ?'<span class="badge cache">⚡ Cached</span>'
+    :'<span class="badge generated">✦ AI Generated</span>';
+  const tracks=d.tracks||d.spotify||[];
+
+  let tracksHtml='';
+  if(tracks.length){
+    const items=tracks.map((t,i)=>{
+      const parts=t.split(' - ');
+      const name=parts[0]||t;
+      const artist=parts.slice(1).join(' - ')||'';
+      return `<div class="track">
+        <div class="track-rank">${i+1}</div>
+        <div class="track-info">
+          <div class="track-name">${name}</div>
+          ${artist?`<div class="track-artist">${artist}</div>`:''}
+        </div>
+        <a class="track-link" href="https://www.last.fm/search?q=${encodeURIComponent(t)}" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </a>
+      </div>`;
+    }).join('');
+    tracksHtml=`<div class="tracks-section">
+      <div class="section-label">🎵 Tracks found</div>
+      <div class="track-grid">${items}</div>
+    </div>`;
+  } else {
+    tracksHtml=`<div class="tracks-section">
+      <div class="section-label">Tracks found</div>
+      <div class="no-tracks">⚠ No tracks — check LASTFM_API_KEY in .env</div>
+    </div>`;
+  }
+
+  const formatted=d.answer
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n\n/g,'</p><p style="margin-top:0.8rem">')
+    .replace(/\n/g,'<br/>');
+
+  document.getElementById('result-area').innerHTML=`
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-meta">
+          ${badge}
+          <span class="query-label">"${q}"</span>
+        </div>
+        <div class="answer">${formatted}</div>
+      </div>
+      ${tracksHtml}
+    </div>`;
+}
+
+document.getElementById('query-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') askApi();
+});
+
+renderHistory();
+updateStats();
+checkHealth();
+</script>
+</body>
+</html>
