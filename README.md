@@ -30,7 +30,7 @@ Spotify API       ← real-time enrichment
    ↓
 Prompt Builder
    ↓
-LLM (OpenAI)
+LLM (Groq)
    ↓
 Final Answer
 ```
@@ -42,7 +42,7 @@ Final Answer
 | Layer          | Technology           |
 | -------------- | -------------------- |
 | API            | FastAPI              |
-| LLM            | OpenAI (gpt-4o-mini) |
+| LLM            | Groq                 |
 | Embeddings     | SentenceTransformers |
 | Vector DB      | FAISS                |
 | Cache (CAG)    | Redis                |
@@ -90,8 +90,7 @@ streamify_ai_pro/
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/your-username/streamify-ai.git
-cd streamify-ai
+git clone https://github.com/your-username/streamify-ai-pro.git
 ```
 
 ---
@@ -115,10 +114,10 @@ pip install -r requirements.txt
 
 ### 4. Setup environment variables
 
-#### 🔑 OpenAI
+#### 🔑 Groq
 
 ```bash
-set OPENAI_API_KEY=your_openai_key
+set Groq_API_KEY=your_Groq_key
 ```
 
 ---
