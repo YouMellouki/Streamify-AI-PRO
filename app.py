@@ -1,13 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from config import get_missing_env_vars
-from rag.retriever import Retriever
 from rag.pipeline import run_pipeline
+from rag.spotify_api import search_tracks
 
-with open("data/songs.txt") as f:
-    docs = [line.strip() for line in f.readlines()]
-
-retriever = Retriever(docs)
 
 app = FastAPI()
 
@@ -16,7 +12,7 @@ class Query(BaseModel):
 
 @app.get("/")
 def root():
-    return {"status":"running"}
+    return {"status": "running"}
 
 @app.get("/health/config")
 def config_health():
@@ -29,6 +25,16 @@ def config_health():
 @app.post("/ask")
 async def ask(q: Query):
     try:
-        return await run_pipeline(q.text, retriever)
+        return await run_pipeline(q.text)
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
+
+
+
+@app.get("/debug/spotify")
+async def debug_spotify():
+    try:
+        tracks = await search_tracks("chill night")
+        return {"tracks": tracks, "count": len(tracks)}
+    except Exception as e:
+        return {"error": str(e)}

@@ -6,8 +6,7 @@ load_dotenv()
 
 REQUIRED_ENV_VARS = (
     "GROQ_API_KEY",
-    "SPOTIFY_CLIENT_ID",
-    "SPOTIFY_CLIENT_SECRET",
+    "LASTFM_API_KEY",
 )
 
 
@@ -28,5 +27,5 @@ def validate_required_env_vars():
 
 
 GROQ_API_KEY = _get_env("GROQ_API_KEY")
-SPOTIFY_CLIENT_ID = _get_env("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = _get_env("SPOTIFY_CLIENT_SECRET")
+LASTFM_API_KEY = _get_env("LASTFM_API_KEY")
+

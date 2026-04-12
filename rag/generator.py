@@ -8,7 +8,7 @@ def generate(prompt):
     client = Groq(api_key=GROQ_API_KEY)
     try:
         r = client.chat.completions.create(
-            model="llama3-8b-8192",   # free & fast; or "mixtral-8x7b-32768"
+            model="llama-3.1-8b-instant",   # free & fast; or "mixtral-8x7b-32768"
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4
         )

@@ -2,39 +2,29 @@ from rag.cache import get_cache, set_cache
 from rag.generator import generate
 from rag.spotify_api import search_tracks
 
-async def run_pipeline(query, retriever):
-
+async def run_pipeline(query):
     cached = get_cache(query)
     if cached:
-        return {"source":"cache","answer":cached}
+        return {"source": "cache", "answer": cached}
 
-    contexts = retriever.search(query)
     spotify = await search_tracks(query)
-
-    context_text = "\n".join(contexts)
-    spotify_text = "\n".join(spotify)
+    spotify_text = "\n".join(spotify) if spotify else "No Spotify results found."
 
     prompt = f'''
-You are a professional music AI.
+You are a professional music AI assistant.
 
-Context:
-{context_text}
-
-Spotify:
+Here are real tracks from Spotify relevant to the user's request:
 {spotify_text}
 
-User:
-{query}
+User request: {query}
 
-Answer briefly and smartly.
+Based on these tracks, give a short and helpful music recommendation.
 '''
-
     answer = generate(prompt)
     set_cache(query, answer)
 
     return {
-        "source":"generated",
-        "answer":answer,
-        "retrieved":contexts,
-        "spotify":spotify
+        "source": "generated",
+        "answer": answer,
+        "spotify": spotify
     }
