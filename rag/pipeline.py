@@ -1,30 +1,34 @@
 from rag.cache import get_cache, set_cache
 from rag.generator import generate
-from rag.lastfm_api import search_tracks  
+from rag.lastfm_api import search_tracks
 
 async def run_pipeline(query):
+    # cache check — returns full object now
     cached = get_cache(query)
     if cached:
-        return {"source": "cache", "answer": cached}
+        return {"source": "cache", "answer": cached["answer"], "tracks": cached["tracks"]}
 
-    spotify = await search_tracks(query)
-    spotify_text = "\n".join(spotify) if spotify else "No Spotify results found."
+    tracks = await search_tracks(query)
+    tracks_text = "\n".join(tracks) if tracks else "No tracks found."
 
     prompt = f'''
 You are a professional music AI assistant.
 
-Here are real tracks from Spotify relevant to the user's request:
-{spotify_text}
+Here are real tracks from Last.fm relevant to the user request:
+{tracks_text}
 
 User request: {query}
 
-Based on these tracks, give a short and helpful music recommendation.
+Give a short, helpful music recommendation based on these tracks.
 '''
     answer = generate(prompt)
-    set_cache(query, answer)
+
+    # save full object to cache
+    full_response = {"answer": answer, "tracks": tracks}
+    set_cache(query, full_response)
 
     return {
         "source": "generated",
         "answer": answer,
-        "spotify": spotify
+        "tracks": tracks
     }
